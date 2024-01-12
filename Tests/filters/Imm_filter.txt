@@ -1,0 +1,5 @@
+000 I_Format
+001 S_Format
+010 B_Format
+011 U_Format
+100 J_Format

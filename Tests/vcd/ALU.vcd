@@ -1,0 +1,125 @@
+$date
+	Tue Jan 09 18:29:16 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module ALU_tb $end
+$var wire 32 ! Result [31:0] $end
+$var wire 1 " Compare $end
+$var reg 4 # Op [3:0] $end
+$var reg 32 $ inputA [31:0] $end
+$var reg 32 % inputB [31:0] $end
+$scope module uut $end
+$var wire 32 & InA [31:0] $end
+$var wire 32 ' InB [31:0] $end
+$var wire 4 ( Op [3:0] $end
+$var parameter 4 ) ADD $end
+$var parameter 4 * AND $end
+$var parameter 4 + EQ $end
+$var parameter 4 , GE $end
+$var parameter 4 - GEU $end
+$var parameter 4 . LT $end
+$var parameter 4 / LTU $end
+$var parameter 4 0 NE $end
+$var parameter 4 1 OR $end
+$var parameter 4 2 SLL $end
+$var parameter 4 3 SLT $end
+$var parameter 4 4 SLTU $end
+$var parameter 4 5 SRA $end
+$var parameter 4 6 SRL $end
+$var parameter 4 7 SUB $end
+$var parameter 4 8 XOR $end
+$var reg 1 " Compare $end
+$var reg 32 9 Result [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b101 8
+b1 7
+b11 6
+b100 5
+b1001 4
+b1000 3
+b10 2
+b111 1
+b1011 0
+b1110 /
+b1100 .
+b1111 -
+b1101 ,
+b1010 +
+b110 *
+b0 )
+$end
+#0
+$dumpvars
+b10011011001101100 9
+b0 (
+b0 '
+b10011011001101100 &
+b0 %
+b10011011001101100 $
+b0 #
+0"
+b10011011001101100 !
+$end
+#10000
+b11001 !
+b11001 9
+b1010 %
+b1010 '
+b1111 $
+b1111 &
+#20000
+b1111 !
+b1111 9
+b1 #
+b1 (
+b11001 $
+b11001 &
+#30000
+b1010000 !
+b1010000 9
+b10 #
+b10 (
+b11 %
+b11 '
+b1010 $
+b1010 &
+#40000
+b0 !
+b0 9
+b11 #
+b11 (
+b101 %
+b101 '
+#50000
+b100 #
+b100 (
+b1111 %
+b1111 '
+b1111 $
+b1111 &
+#60000
+b11111111111111111111111111110001 !
+b11111111111111111111111111110001 9
+b101 #
+b101 (
+b1010 %
+b1010 '
+b11111111111111111111111111111011 $
+b11111111111111111111111111111011 &
+#70000
+b0 !
+b0 9
+b110 #
+b110 (
+b101 $
+b101 &
+#80000
