@@ -1,5 +1,5 @@
-parameter I_format = 3'b000;
-parameter S_format = 3'b001;
-parameter B_format = 3'b010;
-parameter U_format = 3'b011;
-parameter J_format = 3'b100;
+`define I_format 3'b000
+`define S_format 3'b001
+`define B_format 3'b010
+`define U_format 3'b011
+`define J_format 3'b100

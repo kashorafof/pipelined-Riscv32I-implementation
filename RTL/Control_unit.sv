@@ -1,6 +1,6 @@
 module Instruction_decoder(
     input wire [31:0] Instruction,
-    output reg Reg_write, ALU_src1, ALU_src2, JumpE, BranchE, MemWrite, Load_sign,
+    output reg Reg_write, ALU_src1, ALU_src2, JumpE, BranchE, Mem_WriteOrRead, Load_sign,
     output reg [2:0] ALU_op, Mem_op_size, Rd_source,
     output reg [2:0] Format,    
   );
@@ -19,7 +19,7 @@ module Instruction_decoder(
 
   always @(*) begin
 
-    MemWrite = `No_write;
+    Mem_WriteOrRead = `Read;
     BranchE = `No_branch;
     JumpE = `No_jump;
     Reg_write = `No_write;
@@ -116,7 +116,7 @@ module Instruction_decoder(
           Format <= `S_format;
           ALU_src1 <= `ALU_source1_RS1;
           ALU_src2 <= `ALU_source2_IMM;
-          MemWrite <= `Write;
+          Mem_WriteOrRead <= `Write;
           case Funct3
               `F3_SW:     Mem_op_size = `Word;
               `F3_SB:     Mem_op_size = `Byte;

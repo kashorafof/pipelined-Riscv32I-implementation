@@ -1,4 +1,6 @@
 `ifndef Opcode_definitions
+`define Opcode_definitions
+
 `define OPCODE_R 7'B0110011
 `define OPCODE_I 7'B0010011
 `define OPCODE_LD 7'B0000011
@@ -60,8 +62,8 @@
 `define F7_SRA 7'B0100000
 
 
-`define Write = 1'b1
-`define No_write = 1'b0
+`define Read 1'b0
+`define Write 1'b1
 
 `define Jump = 1'b1
 `define No_jump = 1'b0

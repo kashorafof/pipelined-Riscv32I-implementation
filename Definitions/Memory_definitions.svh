@@ -1,5 +1,12 @@
-parameter Word = 2'b00;
-parameter Half = 2'b01;
-parameter Byte = 2'b10;
-parameter Signed = 1'b1;
-parameter Unsigned = 1'b0;
+
+`ifdef MEMORY_DEFINITIONS_SVH
+`define Word 2'b00
+`define Half 2'b01
+`define Byte 2'b10
+`define Signed 1'b1
+`define Unsigned 1'b0
+
+`define Read 1'b0
+`define Write 1'b1
+
+enddef
