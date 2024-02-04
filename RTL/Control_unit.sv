@@ -1,188 +1,186 @@
-module Instruction_decoder(
-    input wire [31:0] Instruction,
-    output reg Reg_write, ALU_src1, ALU_src2, JumpE, BranchE, Mem_WriteOrRead, Load_sign,
-    output reg [2:0] ALU_op, Mem_op_size, Rd_source,
-    output reg [2:0] Format,    
-  );
-  `include "../Definitions/Opcode_definitions.vh"
-  `include "../Definitions/Format_definitions.vh"
-  `include "../Definitions/alu_definitions.vh"
+module Control_unit (
+    input wire [31:0] ID_Instruction_i,
+    output reg Reg_writeE_o, ALU_src1_o,JumpE_o,
+              BranchE_o, Mem_Write_o, Load_sign_o,
+    output reg [2:0] ALU_op_o,
+    Mem_op_size_o,
+    output reg [1:0] Rd_source_o, ALU_src2_o,
+    output reg [2:0] Format_o, Branch_condition_o,
+    ComparitorOp_o,
+    output reg isJALR_o, isLUI_o
+);
+  `include "../Definitions/Format_definitions.svh"
+  `include "../Definitions/Opcode_definitions.svh"
+  `include "../Definitions/alu_definitions.svh"
+  `include "../Definitions/Memory_definitions.svh"
+  `include "../Definitions/Branch_generator.svh"
 
-  reg [6:0] Opcode;
-  reg [2:0] Funct3;
-  reg [6:0] Funct7;
+  wire [6:0] Opcode;
+  wire [2:0] Funct3;
+  wire [6:0] Funct7;
 
-  assign Opcode = Instruction[6:0];
-  assign Funct3 = Instruction[14:12];
-  assign Funct7 = Instruction[31:25];
+  assign Opcode = ID_Instruction_i[6:0];
+  assign Funct3 = ID_Instruction_i[14:12];
+  assign Funct7 = ID_Instruction_i[31:25];
 
 
   always @(*) begin
 
-    Mem_WriteOrRead = `Read;
-    BranchE = `No_branch;
-    JumpE = `No_jump;
-    Reg_write = `No_write;
+    Mem_Write_o = `Read;
+    BranchE_o = `No_branch;
+    JumpE_o = `No_jump;
+    Reg_writeE_o = `Read;
+    isJALR_o = 0;
+    ComparitorOp_o = 0;
+    isLUI_o = 0;
 
-    case Opcode
-    
-      
+    case (Opcode)
       `OPCODE_R: begin
-          Format <= `R_format;
-          ALU_src1 <= `ALU_source1_RS1;
-          ALU_src2 <= `ALU_source2_RS2;
-          Reg_write <= `Write;
-          Rd_source <= `Rd_source_ALU;
+        Format_o <= `R_Format;
+        ALU_src1_o <= `ALU_source1_RS1;
+        ALU_src2_o <= `ALU_source2_RS2;
+        Reg_writeE_o <= `Write;
+        Rd_source_o <= `Rd_source_ALU;
 
-          case Funct3
-              `F3_SLL:    ALU_op <= `SLL;
-              `F3_SLT:    ALU_op <= `SLT;
-              `F3_SLTU:   ALU_op <= `SLTU;
-              `F3_XOR:    ALU_op <= `XOR;
-              `F3_OR:     ALU_op <= `OR;
-              `F3_AND:    ALU_op <= `AND;
-              
-              `F3_SRL_SRA:
-                  if (Funct7 == `F7_SRL)
-                      ALU_op <= `SRL;
-                  else
-                      ALU_op <= `SRA;
-                      
-              `F3_ADD_SUB:
-              if (Funct7 == `F7_ADD)
-                  ALU_op <= `ADD;
-              else
-                  ALU_op <= `SUB;
+        case (Funct3)
+          `F3_SLL:  ALU_op_o = `SLL;
+          `F3_SLT:  ALU_op_o = `SLT;
+          `F3_SLTU: ALU_op_o = `SLTU;
+          `F3_XOR:  ALU_op_o = `XOR;
+          `F3_OR:   ALU_op_o = `OR;
+          `F3_AND:  ALU_op_o = `AND;
 
-              default: ALU_op = `Unknown_op;  //! need to put an exception
-          endcase
+          `F3_SRL_SRA:
+          if (Funct7 == `F7_SRL) ALU_op_o <= `SRL;
+          else ALU_op_o <= `SRA;
+
+          `F3_ADD_SUB:
+          if (Funct7 == `F7_ADD) ALU_op_o <= `ADD;
+          else ALU_op_o <= `SUB;
+
+          default: $error("Not a valid Funct3!");
+        endcase
       end
 
       `OPCODE_I: begin
-          Format <= `I_format;
-          ALU_src1 <= `ALU_source1_RS1;
-          ALU_src2 <= `ALU_source2_IMM;
-          Reg_write <= `Write;
-          Rd_source <= `Rd_source_ALU;
+        Format_o <= `I_Format;
+        ALU_src1_o <= `ALU_source1_RS1;
+        ALU_src2_o <= `ALU_source2_IMM;
+        Reg_writeE_o <= `Write;
+        Rd_source_o <= `Rd_source_ALU;
 
-          case Funct3
-              `F3_ADDI:   ALU_op <= `ADD;
-              `F3_SLTI:   ALU_op <= `SLT;
-              `F3_SLTIU:  ALU_op <= `SLTU;
-              `F3_XORI:   ALU_op <= `XOR;
-              `F3_ORI:    ALU_op <= `OR;
-              `F3_ANDI:   ALU_op <= `AND;
-              `F3_SLLI:   ALU_op <= `SLL;
-              `F3_SRLI_SRAI:
-                  if (Funct7 == `F7_SRLI)
-                      ALU_op <= `SRL;
+        case (Funct3)
+          `F3_ADDI:   ALU_op_o <= `ADD;
+          `F3_SLTI:   ALU_op_o <= `SLT;
+          `F3_SLTIU:  ALU_op_o <= `SLTU;
+          `F3_XORI:   ALU_op_o <= `XOR;
+          `F3_ORI:    ALU_op_o <= `OR;
+          `F3_ANDI:   ALU_op_o <= `AND;
+          `F3_SLLI:   ALU_op_o <= `SLL;
+          `F3_SRLI_SRAI:
+                  if (Funct7 == `F7_SRL)
+                      ALU_op_o <= `SRL;
                   else
-                      ALU_op <= `SRA;
-              default: ALU_op = `Unknown_op;  //! need to put an exception
-          endcase
+                      ALU_op_o <= `SRA;
+          default: $error("Not a valid Funct3!");
+        endcase
       end
 
       `OPCODE_LD: begin
-          Format <= `I_format;
-          ALU_src1 <= `ALU_source1_RS1;
-          ALU_src2 <= `ALU_source2_IMM;
-          Reg_write <= `Write;
-          Rd_source <= `Rd_source_MEM;
-          case Funct3
-              `F3_LW:     Mem_op_size <= `Word;
-              `F3_LB:  begin
-                  Mem_op_size <= `Byte;
-                  Load_sign <= `Signed;
-              end
-              `F3_LBU: begin
-                  Mem_op_size <= `ByteU;
-                  Load_sign <= `Unsigned;
-              end
-              `F3_LH:  begin
-                  Mem_op_size <= `Half;
-                  Load_sign <= `Signed;
-              end
-              `F3_LHU: begin
-                  Mem_op_size <= `Half;
-                  Load_sign <= `Unsigned;
-              end
-              default: ALU_op <= `Unknown_op;  //! need to put an exception
-          endcase
-      end
-
-      
-      `OPCODE_S: 
-      begin
-          Format <= `S_format;
-          ALU_src1 <= `ALU_source1_RS1;
-          ALU_src2 <= `ALU_source2_IMM;
-          Mem_WriteOrRead <= `Write;
-          case Funct3
-              `F3_SW:     Mem_op_size = `Word;
-              `F3_SB:     Mem_op_size = `Byte;
-              `F3_SH:     Mem_op_size = `Half;
-              default: ALU_op = `Unknown_op;  //! need to put an exception
-          endcase
-      end
-
-      `OPCODE_B:
-      begin
-          Format <= `B_format;
-          ALU_src1 <= `ALU_source1_RS1;
-          ALU_src2 <= `ALU_source2_RS2;
-          BranchE <= `Branch;
-          case Funct3
-              `F3_BEQ:    ALU_op <= `EQ;
-              `F3_BNE:    ALU_op <= `NE;
-              `F3_BLT:    ALU_op <= `LT;
-              `F3_BGE:    ALU_op <= `GE;
-              `F3_BLTU:   ALU_op <= `LTU;
-              `F3_BGEU:   ALU_op <= `GEU;
-              default: ALU_op <= `Unknown_op;  //! need to put an exception
-          endcase
-      end
-
-      `OPCODE_JAL:
-      begin
-          Format <= `J_format;
-          ALU_src1 <= `ALU_source1_PC;
-          ALU_src2 <= `ALU_source2_IMM;
-          JumpE <= `Jump;
-          Reg_write <= `Write;
-          Rd_source <= `Rd_source_PC;
-      end
-
-      `OPCODE_JALR:
-      begin
-          Format <= `I_format;
-          ALU_src1 <= `ALU_source1_RS1;
-          ALU_src2 <= `ALU_source2_IMM;
-          JumpE <= `Jump;
-          Reg_write <= `Write;
-          Rd_source <= `Rd_source_PC;
+        Format_o <= `I_Format;
+        ALU_src1_o <= `ALU_source1_RS1;
+        ALU_src2_o <= `ALU_source2_IMM;
+        Reg_writeE_o <= `Write;
+        Rd_source_o <= `Rd_source_MEM;
+        case (Funct3)
+          `F3_LW:  Mem_op_size_o <= `Word;
+          `F3_LB: begin
+            Mem_op_size_o <= `Byte;
+            Load_sign_o   <= `Signed;
+          end
+          `F3_LBU: begin
+            Mem_op_size_o <= `Byte;
+            Load_sign_o   <= `Unsigned;
+          end
+          `F3_LH: begin
+            Mem_op_size_o <= `Half;
+            Load_sign_o   <= `Signed;
+          end
+          `F3_LHU: begin
+            Mem_op_size_o <= `Half;
+            Load_sign_o   <= `Unsigned;
+          end
+          default: $error("Not a valid Funct3!");
+        endcase
       end
 
 
-      `OPCODE_LUI:
-      begin
-          Format ,= `U_format;
-          ALU_src1 <= `ALU_source1_RS1; // X
-          ALU_src2 <= `ALU_source2_IMM; // X
-          Reg_write <= `Write;
-          Rd_source <= `RD_source_IMM;           
+      `OPCODE_S: begin
+        Format_o <= `S_Format;
+        ALU_src1_o <= `ALU_source1_RS1;
+        ALU_src2_o <= `ALU_source2_IMM;
+        Mem_Write_o <= `Write;
+        case (Funct3)
+          `F3_SW:  Mem_op_size_o = `Word;
+          `F3_SB:  Mem_op_size_o = `Byte;
+          `F3_SH:  Mem_op_size_o = `Half;
+          default: $error("Not a valid Funct3!");
+        endcase
+      end
+
+      `OPCODE_B: begin
+        Format_o   <= `B_Format;
+        BranchE_o  <= `Branch;
+        case (Funct3)
+          `F3_BEQ:  Branch_condition_o <= `EQ;
+          `F3_BNE:  Branch_condition_o <= `NE;
+          `F3_BLT:  Branch_condition_o <= `LT;
+          `F3_BGE:  Branch_condition_o <= `GE;
+          `F3_BLTU: Branch_condition_o <= `LTU;
+          `F3_BGEU: Branch_condition_o <= `GEU;
+          default:  $error("Not a valid Funct3!");
+        endcase
+      end
+
+      `OPCODE_JAL: begin
+        Format_o <= `J_Format;
+        ALU_src1_o <= `ALU_source1_PC;
+        ALU_src2_o <= `ALU_source2_4;
+        JumpE_o <= `Jump;
+        Reg_writeE_o <= `Write;
+        Rd_source_o <= `Rd_source_ALU;
+      end
+
+      `OPCODE_JALR: begin
+        Format_o <= `I_Format;
+        ALU_src1_o <= `ALU_source1_RS1;
+        ALU_src2_o <= `ALU_source2_4;
+        JumpE_o <= `Jump;
+        Reg_writeE_o <= `Write;
+        Rd_source_o <= `Rd_source_ALU;
+        isJALR_o <= 1;
       end
 
 
-      `OPCODE_AUIPC:
-      begin
-          Format <= `U_format;
-          ALU_src1 <= `ALU_source1_PC; 
-          ALU_src2 <= `ALU_source2_IMM; 
-          Reg_write <= `Write;
-          Rd_source <= `Rd_source_ALU;
+      `OPCODE_LUI: begin
+        Format_o <= `U_Format;
+        ALU_src1_o <= `ALU_source1_RS1;  
+        ALU_src2_o <= `ALU_source2_IMM;  
+        Reg_writeE_o <= `Write;
+        Rd_source_o <= `Rd_source_ALU;
+        isLUI_o <= 1;
       end
 
-      default: Format = `Unknown_format;  //! need to put an exception
+
+      `OPCODE_AUIPC: begin
+        Format_o <= `U_Format;
+        ALU_src1_o <= `ALU_source1_PC;
+        ALU_src2_o <= `ALU_source2_IMM;
+        Reg_writeE_o <= `Write;
+        Rd_source_o <= `Rd_source_ALU;
+      end
+
+      default: $error("Not a valid OPCODE!");
     endcase
 
   end

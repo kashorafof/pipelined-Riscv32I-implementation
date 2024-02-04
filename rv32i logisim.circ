@@ -2274,7 +2274,7 @@
     <comp lib="0" loc="(1470,2310)" name="Pin">
       <a name="appearance" val="classic"/>
       <a name="facing" val="west"/>
-      <a name="label" val="Load_Sign"/>
+      <a name="label" val="Load_sign_o"/>
       <a name="output" val="true"/>
     </comp>
     <comp lib="0" loc="(1540,2130)" name="Ground"/>

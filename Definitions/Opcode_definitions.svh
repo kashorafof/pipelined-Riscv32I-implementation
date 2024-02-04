@@ -65,24 +65,27 @@
 `define Read 1'b0
 `define Write 1'b1
 
-`define Jump = 1'b1
-`define No_jump = 1'b0
+`define Jump 1'b1
+`define No_jump 1'b0
 
-`define Branch = 1'b1
-`define No_branch = 1'b0
-
-
-`define RD_source_ALU = 2'b00
-`define RD_source_MEM = 2'b01
-`define RD_source_PC = 2'b10
-`define RD_source_IMM = 2'b11
-
-`define ALU_source2_RS2 = 1'b0
-`define ALU_source2_IMM = 1'b1
-
-`define ALU_source1_RS1 = 1'b0
-`define ALU_source1_PC = 1'b1
+`define Branch 1'b1
+`define No_branch 1'b0
 
 
+`define Rd_source_ALU 1'b0
+`define Rd_source_MEM 1'b1
+
+`define ALU_source1_RS1 1'b0
+`define ALU_source1_PC 1'b1
+
+`define ALU_source2_RS2 2'b00
+`define ALU_source2_IMM 2'b01
+`define ALU_source2_4 2'b10
 
 
+`define PC_source_PC 1'b0
+`define PC_source_Branch 1'b1
+
+`define NOP_instruction 32'h00000013
+
+`endif
