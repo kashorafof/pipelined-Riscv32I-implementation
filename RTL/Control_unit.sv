@@ -1,12 +1,10 @@
 module Control_unit (
     input wire [31:0] ID_Instruction_i,
-    output reg Reg_writeE_o, ALU_src1_o,JumpE_o,
-              BranchE_o, Mem_Write_o, Load_sign_o,
-    output reg [2:0] ALU_op_o,
-    Mem_op_size_o,
-    output reg [1:0] Rd_source_o, ALU_src2_o,
-    output reg [2:0] Format_o, Branch_condition_o,
-    ComparitorOp_o,
+    output reg Reg_writeE_o, ALU_src1_o, JumpE_o,
+              BranchE_o, Mem_Write_o, Load_sign_o, Rd_source_o
+    output reg [3:0] ALU_op_o, 
+    output reg [1:0] ALU_src2_o,
+    output reg [2:0] Format_o, Mem_op_size_o, ComparitorOp_o,
     output reg isJALR_o, isLUI_o
 );
   `include "../Definitions/Format_definitions.svh"
@@ -132,12 +130,12 @@ module Control_unit (
         Format_o   <= `B_Format;
         BranchE_o  <= `Branch;
         case (Funct3)
-          `F3_BEQ:  Branch_condition_o <= `EQ;
-          `F3_BNE:  Branch_condition_o <= `NE;
-          `F3_BLT:  Branch_condition_o <= `LT;
-          `F3_BGE:  Branch_condition_o <= `GE;
-          `F3_BLTU: Branch_condition_o <= `LTU;
-          `F3_BGEU: Branch_condition_o <= `GEU;
+          `F3_BEQ:  ComparitorOp_o <= `EQ;
+          `F3_BNE:  ComparitorOp_o <= `NE;
+          `F3_BLT:  ComparitorOp_o <= `LT;
+          `F3_BGE:  ComparitorOp_o <= `GE;
+          `F3_BLTU: ComparitorOp_o <= `LTU;
+          `F3_BGEU: ComparitorOp_o <= `GEU;
           default:  $error("Not a valid Funct3!");
         endcase
       end

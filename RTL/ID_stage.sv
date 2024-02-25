@@ -27,26 +27,25 @@ module ID_stage (
 
 
     // From EX stage to next stages
-    output wire [31:0] Read_reg1_o,
-    Read_reg2_o,  // Read registers for next stages
+    output wire [31:0] Read_reg1_o, Read_reg2_o,  // Read registers for next stages
 
     // Control signals
-    output reg Reg_writeE_o,
-    ALU_src1_o,
-    ALU_src2_o,
-    Mem_Write_o,
-    Load_sign_o_o,
-    IF_flush_o,
+    output wire Reg_writeE_o,
+    output wire ALU_src1_o,
+    output wire Mem_Write_o,
+    output wire Load_sign_o_o,
+    output wire IF_flush_o,
 
-    output reg [3:0] ALU_op_o,  // ALU operation 
-    output reg [2:0] Mem_op_size_o,  // Memory operation size
-    output reg [1:0] Rd_source_o,  // Source register for Write operation
-    output reg [4:0] Rd_o,  // Instruction format
-    output reg [31:0] Immediate_o,
+    output wire [1:0] ALU_src2_o,
+    output wire [3:0] ALU_op_o,  // ALU operation 
+    output wire [2:0] Mem_op_size_o,  // Memory operation size
+    output wire [1:0] Rd_source_o,  // Source register for Write operation
+    output wire [4:0] Rd_o,  // Instruction format
+    output wire [31:0] Immediate_o,
 
     // For Branching
-    output reg [31:0] Branch_target_o,  // Branch target address
-    output reg PCSrc_o,  // 0 -> PC + 4, 1 -> Branch_target_o
+    output wire [31:0] Branch_target_o,  // Branch target address
+    output wire PCSrc_o,  // 0 -> PC + 4, 1 -> Branch_target_o
     output wire stall_o
 );
   `include "../Definitions/Opcode_definitions.svh"
@@ -88,6 +87,11 @@ module ID_stage (
   assign stall_o = ((EX_Rd_i == Rs1 | EX_Rd_i == Rs2) & EX_Reg_writeE_i & (EX_Rd_source_i == `Rd_source_MEM)) ? 1'b1 : 1'b0;
 
 
+
+
+
+
+
   // Instance of Control Unit
   Control_unit Control_unit_inst (
       .Instruction_i(Instruction),
@@ -102,6 +106,7 @@ module ID_stage (
       .Mem_op_size_o(Mem_op_size),
       .Rd_source_o(Rd_source),
       .Format_o(Format),
+      .Branch_condition_o(Branch_condition),
       .isJALR_o(isJALR),
       .isLUI_o(isLUI)
   );
@@ -111,7 +116,7 @@ module ID_stage (
       .ID_Rs1_i(Read_reg1),
       .ID_Rs2_i(Read_reg2),
       .ID_PC_i(IF_PC_i),
-      .ID_Immediate_i(Immediate_o),
+      .ID_Immediate_i(Immediate_o ),
       .ID_ComparitorOp_i(ComparitorOp),
       .ID_BranchE_i(BranchE),
       .ID_JumpE_i(JumpE),
@@ -128,6 +133,7 @@ module ID_stage (
       .Format_i(Format),
       .Immediate_o(Immediate_o)
   );
+
 
 
 
