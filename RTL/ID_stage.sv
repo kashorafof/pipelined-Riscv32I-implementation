@@ -88,10 +88,6 @@ module ID_stage (
 
 
 
-
-
-
-
   // Instance of Control Unit
   Control_unit Control_unit_inst (
       .Instruction_i(Instruction),
@@ -124,8 +120,6 @@ module ID_stage (
       .PC_source_o(PC_source_o),
       .Branch_target_o(Branch_target_o)
   );
-
-
 
   // Instance of Immediate Extender
   Immediate_extender Immediate_extender_inst (
