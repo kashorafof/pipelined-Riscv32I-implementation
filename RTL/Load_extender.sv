@@ -1,7 +1,7 @@
 module load_extender(
     input wire [31:0] Imm_in,
-    input wire [1:0] Size,
-    input wire sign,
+    input wire [1:0] Size_i,
+    input wire Sign_i,
     output wire [31:0] Imm_out
   );
   `include "../Definitions/Loader_definitions.vh"
