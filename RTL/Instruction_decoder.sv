@@ -1,11 +1,21 @@
-module Control_unit (
+module Instruction_decoder (
     input wire [31:0] ID_Instruction_i,
-    output wire Reg_writeE_o, ALU_src1_o, JumpE_o,
-              BranchE_o, Mem_Write_o, Load_sign_o, Rd_source_o
-    output wire [3:0] ALU_op_o, 
+
+
+    output wire Reg_wr_en_o, 
+    output wire Jump_en_o,
+    output wire Branch_en_o, 
+    output wire Mem_wr_en_o, 
+    output wire Load_sign_o, 
+    output wire Rd_source_o,
+    output wire isJALR_o,
+    output wire isLUI_o
+
+    output wire       ALU_src1_o, 
     output wire [1:0] ALU_src2_o,
+    output wire [3:0] ALU_op_o, 
+
     output wire [2:0] Format_o, Memp_size_o, ComparitorOp_o,
-    output wire isJALR_o, isLUI_o
 );
   `include "../Definitions/Format_definitions.svh"
   `include "../Definitions/Opcode_definitions.svh"
@@ -20,18 +30,18 @@ module Control_unit (
   assign Opcode = ID_Instruction_i[6:0];
   assign Funct3 = ID_Instruction_i[14:12];
   assign Funct7 = ID_Instruction_i[31:25];
-  reg Reg_writeE, ALU_src1, JumpE,
+  reg Reg_wr_en_i, ALU_src1, JumpE,
             BranchE, Mem_Write, Load_sign, Rd_source;
   reg [3:0] ALU_op; 
   reg [1:0] ALU_src2;
   reg [2:0] Format, Memp_size, ComparitorOp;
   reg isJALR, isLUI;
 
-  assign Reg_writeE_o = Reg_writeE;
+  assign Reg_wr_en_o = Reg_wr_en_i;
   assign ALU_src1_o = ALU_src1;
-  assign JumpE_o = JumpE;
-  assign BranchE_o = BranchE;
-  assign Mem_Write_o = Mem_Write;
+  assign Jump_en_o = JumpE;
+  assign Branch_en_o = BranchE;
+  assign Mem_wr_en_o = Mem_Write;
   assign Load_sign_o = Load_sign;
   assign Rd_source_o = Rd_source;
   assign ALU_op_o = ALU_op;
@@ -48,7 +58,7 @@ module Control_unit (
     Mem_Write = `Read;
     BranchE = `No_branch;
     JumpE = `No_jump;
-    Reg_writeE = `Read;
+    Reg_wr_en_i = `Read;
     isJALR = 0;
     ComparitorOp = 0;
     isLUI = 0;
@@ -58,7 +68,7 @@ module Control_unit (
         Format <= `R_Format;
         ALU_src1 <= `ALU_source1_RS1;
         ALU_src2 <= `ALU_source2_RS2;
-        Reg_writeE <= `Write;
+        Reg_wr_en_i <= `Write;
         Rd_source <= `Rd_source_ALU;
 
         case (Funct3)
@@ -85,7 +95,7 @@ module Control_unit (
         Format <= `I_Format;
         ALU_src1 <= `ALU_source1_RS1;
         ALU_src2 <= `ALU_source2_IMM;
-        Reg_writeE <= `Write;
+        Reg_wr_en_i <= `Write;
         Rd_source <= `Rd_source_ALU;
 
         case (Funct3)
@@ -109,7 +119,7 @@ module Control_unit (
         Format <= `I_Format;
         ALU_src1 <= `ALU_source1_RS1;
         ALU_src2 <= `ALU_source2_IMM;
-        Reg_writeE <= `Write;
+        Reg_wr_en_i <= `Write;
         Rd_source <= `Rd_source_MEM;
         case (Funct3)
           `F3_LW:  Memp_size <= `Word;
@@ -166,7 +176,7 @@ module Control_unit (
         ALU_src1 <= `ALU_source1_PC;
         ALU_src2 <= `ALU_source2_4;
         JumpE <= `Jump;
-        Reg_writeE <= `Write;
+        Reg_wr_en_i <= `Write;
         Rd_source <= `Rd_source_ALU;
       end
 
@@ -175,7 +185,7 @@ module Control_unit (
         ALU_src1 <= `ALU_source1_RS1;
         ALU_src2 <= `ALU_source2_4;
         JumpE <= `Jump;
-        Reg_writeE <= `Write;
+        Reg_wr_en_i <= `Write;
         Rd_source <= `Rd_source_ALU;
         isJALR <= 1;
       end
@@ -185,7 +195,7 @@ module Control_unit (
         Format <= `U_Format;
         ALU_src1 <= `ALU_source1_RS1;  
         ALU_src2 <= `ALU_source2_IMM;  
-        Reg_writeE <= `Write;
+        Reg_wr_en_i <= `Write;
         Rd_source <= `Rd_source_ALU;
         isLUI <= 1;
       end
@@ -195,7 +205,7 @@ module Control_unit (
         Format <= `U_Format;
         ALU_src1 <= `ALU_source1_PC;
         ALU_src2 <= `ALU_source2_IMM;
-        Reg_writeE <= `Write;
+        Reg_wr_en_i <= `Write;
         Rd_source <= `Rd_source_ALU;
       end
 
