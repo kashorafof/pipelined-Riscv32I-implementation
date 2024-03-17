@@ -90,6 +90,19 @@
 `define Rd_source_ALU 1'b0
 `define Rd_source_MEM 1'b1
 
+`define forward_reg1_RS1 2'b00
+`define forward_reg1_EX 2'b01
+`define forward_reg1_MEM 2'b10
+`define forward_reg1_Zero 2'b11
+
+
+
+`define forward_reg2_RS1 2'b00
+`define forward_reg2_EX 2'b01
+`define forward_reg2_MEM 2'b10
+`define forward_reg2_Zero 2'b11
+
+
 `define ALU_source1_RS1 1'b0
 `define ALU_source1_PC 1'b1
 

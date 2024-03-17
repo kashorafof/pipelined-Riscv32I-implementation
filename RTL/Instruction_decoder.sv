@@ -1,7 +1,6 @@
 module Instruction_decoder (
     input wire [31:0] ID_Instruction_i,
 
-
     output wire Reg_wr_en_o, 
     output wire Jump_en_o,
     output wire Branch_en_o, 
@@ -17,6 +16,8 @@ module Instruction_decoder (
 
     output wire [2:0] Format_o, Memp_size_o, ComparitorOp_o,
 );
+
+
   `include "../Definitions/Format_definitions.svh"
   `include "../Definitions/Opcode_definitions.svh"
   `include "../Definitions/alu_definitions.svh"

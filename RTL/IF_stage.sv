@@ -1,8 +1,8 @@
 module IF_stage(
-  input clk_i, rst_i, // Add a comma here
-  input wire ID_PCsrc_i, ID_stall_i,
+  input clk_i, rst_i,
+  input wire ID_branch_en_i, ID_stall_i,
   input wire [31:0] ID_Branch_target_i,
-  output reg [31:0] PC_o, instruction_o
+  output reg [31:0] PC_o
 );
 
 reg [31:0] PC;
@@ -18,10 +18,17 @@ always @(posedge clk_i)
 begin
   PC_o = ID_PCsrc_i ? ID_Branch_target_i : PC;
   if (ID_stall_i)
+  begin
     PC = PC;
+    PC_o = PC-32'h4; // Send the same IP again
+  end
+  else if (ID_branch_en_i)
+  begin
+    PC = ID_Branch_target_i; // the pipeline will be flushed so PC_o will not matter    
+  end
   else
-    PC = ID_PCsrc_i ? ID_Branch_target_i : PC + 32'h4;
-  instruction_o <= $readmemh("instructions.txt", PC);
+    PC = PC + 32'h4;
+  
 end
 
 
