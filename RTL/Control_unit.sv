@@ -2,7 +2,7 @@ module Control_unit(
   input wire clk_i, rst_i,
 
   input wire [31:0] Instruction_i,
-  input wire [31:0] PC_i,
+  //input wire [31:0] PC_i,
 
   input wire [4:0]  EX_rd_addr_i,  // Source register for EX stage
   input wire        EX_rd_wr_en_i,  // Write enable signal from EX stage
@@ -17,10 +17,10 @@ module Control_unit(
   input wire        ID_branch_en_i,  // 0 -> PC + 4, 1 -> ID_branch_addr_o
 
   output reg flush_o, stall_o,
-  output reg [1:0] forward_reg1_O,
-  output reg [1:0] forward_reg2_O,
-
+  output reg [1:0] forward_reg1_o,
+  output reg [1:0] forward_reg2_o
 );
+`include "../Definitions/Definitions.svh"
 
   wire [6:0] Opcode;
   wire [2:0] Funct3;
@@ -30,8 +30,9 @@ module Control_unit(
   assign Funct3 = Instruction_i[14:12];
   assign Funct7 = Instruction_i[31:25];
 
-  assign rs1_addr = Instruction[19:15];
-  assign rs2_addr = Instruction[24:20];
+  wire [4:0] rs1_addr, rs2_addr;
+  assign rs1_addr = Instruction_i[19:15];
+  assign rs2_addr = Instruction_i[24:20];
 
 
   // Forward if:
@@ -40,43 +41,42 @@ module Control_unit(
   // if the reg is zero -> give a zero value
 
   // In case of WB stage, the data is already written in the register file
-  always*(posedge clk_i)
-  begin
+  always@(*) begin
     if (rst_i)
     begin
+      flush_o <= 1'b1;
+      stall_o <= 1'b0;
+      forward_reg1_o <= 2'b00;
+      forward_reg2_o <= 2'b00;
+    end else begin
       flush_o <= 1'b0;
       stall_o <= 1'b0;
-      forward_reg1_O <= 2'b00;
-      forward_reg2_O <= 2'b00;
-
+      forward_reg1_o <= `forward_reg1_RS1;
+      forward_reg2_o <= `forward_reg2_RS2;
     end
-    else
-    begin
-
-      flush_o <= 1'b0;
-      stall_o <= 1'b0;
-      forward_reg1_O <= `forward_reg1_RS1;
-      forward_reg2_O <= `forward_reg2_RS1;
 
 
+      // Data hazard from the MEM stage
       if (MEM_rd_wr_en_i)
       begin
         if (MEM_rd_addr_i == rs1_addr && rs1_addr != 0)
-          forward_reg1_O <= `forward_reg1_MEM;
+          forward_reg1_o <= `forward_reg1_MEM;
         if (MEM_rd_addr_i == rs2_addr && rs2_addr != 0)
-          forward_reg2_O <= `forward_reg2_MEM;
+          forward_reg2_o <= `forward_reg2_MEM;
       end
+      // Data hazard from the EX stage
       if (EX_rd_wr_en_i)
       begin
         if (EX_rd_addr_i == rs1_addr && rs1_addr != 0)
-          forward_reg1_O <= `forward_reg1_EX;
-        if (EX_Rd_i == rs2_addr && rs2_addr != 0)
-          forward_reg2_O <= `forward_reg2_EX;
+          forward_reg1_o <= `forward_reg1_EX;
+        if (EX_rd_addr_i == rs2_addr && rs2_addr != 0)
+          forward_reg2_o <= `forward_reg2_EX;
       end
+      // ! Not sure if there is a need for this
       if (rs1_addr == 0)
-        forward_reg1_O <= `forward_reg1_Zero;
+        forward_reg1_o <= `forward_reg1_Zero;
       if (rs2_addr == 0)
-        forward_reg2_O <= `forward_reg2_Zero;
+        forward_reg2_o <= `forward_reg2_Zero;
     end
 
 
@@ -99,11 +99,5 @@ module Control_unit(
       else
         flush_o = 1'b0;
     end
-
-
-
-
-  end
-
 
 endmodule

@@ -4,13 +4,13 @@ module load_extender(
     input wire Sign_i,
     output wire [31:0] Imm_out
   );
-  `include "../Definitions/Loader_definitions.vh"
+  `include "../Definitions/Definitions.svh"
 
-  assign Imm_out = (Size == `Word) ? Imm_in :
-          (Size == `Half && sign) ? { {16{Imm_in[15]}}, Imm_in[15:0] } :
-          (Size == `Half && !sign) ? { {20{1'b0}}, Imm_in[15:0] } :
-          (Size == `Byte && sign) ? { {24{Imm_in[7]}}, Imm_in[7:0] } :
-          (Size == `Byte && !sign) ? { {24{1'b0}}, Imm_in[7:0] } :
+  assign Imm_out = (Size_i == `Word) ? Imm_in :
+          (Size_i == `Half && Sign_i == `Signed) ? { {16{Imm_in[15]}}, Imm_in[15:0] } :
+          (Size_i == `Half && Sign_i == `Unsigned) ? { {20{1'b0}}, Imm_in[15:0] } :
+          (Size_i == `Byte && Sign_i == `Signed) ? { {24{Imm_in[7]}}, Imm_in[7:0] } :
+          (Size_i == `Byte && Sign_i == `Unsigned) ? { {24{1'b0}}, Imm_in[7:0] } :
           32'b0;
     
 /*

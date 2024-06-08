@@ -11,8 +11,8 @@ module Register_file (
 
   reg [31:0] Registers[31:0];
 
-  assign Read_reg1_o = (ID_rs1_i == ID_rd_i) ? ID_wr_data_i : Registers[Rs1_i];
-  assign Read_reg2_o = (ID_rs2_i == ID_rd_i) ? ID_wr_data_i : Registers[Rs2_i];
+  assign Read_reg1_o = (ID_rs1_i == ID_rd_i) ? ID_wr_data_i : Registers[ID_rs1_i];
+  assign Read_reg2_o = (ID_rs2_i == ID_rd_i) ? ID_wr_data_i : Registers[ID_rs2_i];
 
 
   integer i;

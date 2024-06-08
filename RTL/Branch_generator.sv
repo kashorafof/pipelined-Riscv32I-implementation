@@ -5,8 +5,7 @@ module Branch_generator(
   output wire PC_source_o,
   output wire [31:0] Branch_target_o
 );
-  `include "../Definitions/Branch_generator.svh"
-  `include "../Definitions/Opcode_definitions.svh"
+  `include "../Definitions/Definitions.svh"
   wire comparision_result;
   assign comparision_result = (ID_ComparitorOp_i == `EQ)   ? ID_Rs1_i == ID_Rs2_i :
                               (ID_ComparitorOp_i == `NE)   ? ID_Rs1_i != ID_Rs2_i :
@@ -18,10 +17,5 @@ module Branch_generator(
 
   assign Branch_target_o = (ID_isJALR_i ? ID_Rs1_i + ID_Immediate_i : ID_PC_i + ID_Immediate_i); 
   assign PC_source_o = ((ID_BranchE_i & comparision_result) | ID_JumpE_i) ? `PC_source_Branch : `PC_source_PC;
-
-  
-  
-  
-              
 
 endmodule

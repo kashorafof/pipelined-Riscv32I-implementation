@@ -6,8 +6,8 @@ module ID_stage (
     // From control unit
     input wire flush_i, // Stall signal from ID stage.
     input wire stall_i,  // Stall signal from ID stage.
-    input wire [1:0] forward_reg1_i;
-    input wire [1:0] forward_reg2_i;
+    input wire [1:0] forward_reg1_i,
+    input wire [1:0] forward_reg2_i,
 
     // From WB stage
     input wire        WB_reg_wr_en_i,  // Write enable signal from Write Back (WB) stage
@@ -37,14 +37,14 @@ module ID_stage (
     output reg         ID_alu_src1_o,
     output reg [1:0]   ID_alu_src2_o,
     output reg [3:0]   ID_alu_op_o,  // ALU operation 
-    output reg [2:0]   ID_mem_op_size_o,  // Memory operation size
+    output reg [1:0]   ID_mem_op_size_o,  // Memory operation size
     output reg [31:0]  ID_imm_o,
 
     // For Branching
     output reg ID_branch_en_o,  // 0 -> PC + 4, 1 -> ID_branch_addr_o
-    output reg [31:0]  ID_branch_addr_o,  // Branch target address
+    output reg [31:0]  ID_branch_addr_o  // Branch target address
 );
-  `include "../Definitions/Opcode_definitions.svh"
+  `include "../Definitions/Definitions.svh"
 
   // Internal signals
   wire [4:0] rs1_addr, rs2_addr, rd;
@@ -70,25 +70,23 @@ module ID_stage (
   );
 
 
-  wire isJALR, isLUI;
-  reg JumpE, BranchE;
   wire [31:0] ID_read_rs1, ID_read_rs2;
 
-  assign ID_read_rs1 = (forward_reg1_i == `forward_reg1_rs1) ? rs1_reg :
+  assign ID_read_rs1 = (forward_reg1_i == `forward_reg1_RS1) ? rs1_reg :
                        (forward_reg1_i == `forward_reg1_EX) ? EX_ALU_result_i :
                        (forward_reg1_i == `forward_reg1_MEM) ? MEM_Load_result_i :
                        32'b0;
-  assign ID_read_rs2 = (forward_reg2_i == `forward_reg2_rs2) ? rs2_reg :
+  assign ID_read_rs2 = (forward_reg2_i == `forward_reg2_RS2) ? rs2_reg :
                         (forward_reg2_i == `forward_reg2_EX) ? EX_ALU_result_i :
                         (forward_reg2_i == `forward_reg2_MEM) ? MEM_Load_result_i :
                         32'b0;
   
   
-  wire Reg_wr_en,;
+  wire Reg_wr_en;
   wire Jump_en;
-  wire Branch_en,;
-  wire Mem_wr_en,;
-  wire Load_sign,;
+  wire Branch_en;
+  wire Mem_wr_en;
+  wire Load_sign;
   wire rd_source;
   wire isJALR;
   wire isLUI;
@@ -101,20 +99,28 @@ module ID_stage (
   // Instance of Control Unit
   Instruction_decoder Instruction_decoder_inst (
     .ID_Instruction_i(Instruction),
-    .Reg_writeE_o(WB_reg_wr_en_i),
-    .Jump_en_o(JumpE),
-    .Branch_en_o(BranchE),
-    .Mem_wr_en_o(ID_mem_wr_en_o),
-    
-
+    .Reg_wr_en_o(Reg_wr_en),
+    .Jump_en_o(Jump_en),
+    .Branch_en_o(Branch_en),
+    .Mem_wr_en_o(Mem_wr_en_o),
+    .Load_sign_o(Load_sign),
+    .Rd_source_o(rd_source),
+    .isJALR_o(isJALR),
+    .isLUI_o(isLUI),
+    .ALU_src1_o(ALU_src1),
+    .ALU_src2_o(ALU_src2),
+    .ALU_op_o(ALU_op),
+    .Format_o(Format),
+    .Mem_op_size_o(Mem_size),
+    .ComparitorOp_o(ComparitorOp)
   );
 
   wire PC_source;
   wire [31:0] branch_addr;
   // Instance of Branch Comparator
   Branch_generator Branch_generator_inst (
-      .ID_rs1_i(Read_reg1),
-      .ID_rs2_i(Read_reg2),
+      .ID_Rs1_i(ID_read_rs1),
+      .ID_Rs2_i(ID_read_rs2),
       .ID_PC_i(IF_PC_i),
       .ID_Immediate_i(ID_imm_o ),
       .ID_ComparitorOp_i(ComparitorOp),
@@ -122,7 +128,7 @@ module ID_stage (
       .ID_JumpE_i(JumpE),
       .ID_isJALR_i(isJALR),
       .PC_source_o(PC_source),
-      .ID_branch_addr_o(branch_addr)
+      .Branch_target_o(branch_addr)
   );
 
 
@@ -131,7 +137,7 @@ module ID_stage (
   Immediate_extender Immediate_extender_inst (
       .Instruction_i(Instruction),
       .Format_i(Format),
-      .ID_imm_o(Immediate)
+      .Immediate_o(Immediate)
   );
 
 
@@ -162,12 +168,6 @@ module ID_stage (
     ID_branch_addr_o <= branch_addr;
     ID_read_rs1_o <= ID_read_rs1;
     ID_read_rs2_o <= ID_read_rs2;
-
   end
-
-
-
-
-
 
 endmodule

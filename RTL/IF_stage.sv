@@ -1,6 +1,6 @@
 module IF_stage(
   input clk_i, rst_i,
-  input wire ID_branch_en_i, ID_stall_i,
+  input wire ID_branch_en_i, stall_i,
   input wire [31:0] ID_Branch_target_i,
   output reg [31:0] PC_o
 );
@@ -16,8 +16,8 @@ end
 
 always @(posedge clk_i)
 begin
-  PC_o = ID_PCsrc_i ? ID_Branch_target_i : PC;
-  if (ID_stall_i)
+  PC_o = ID_branch_en_i ? ID_Branch_target_i : PC;
+  if (stall_i)
   begin
     PC = PC;
     PC_o = PC-32'h4; // Send the same IP again
