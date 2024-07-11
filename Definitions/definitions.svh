@@ -1,6 +1,21 @@
 `ifndef definitions
 `define definitions
 
+// Format definitions
+`define I_Format 3'b000
+`define S_Format 3'b001
+`define B_Format 3'b010
+`define U_Format 3'b011
+`define J_Format 3'b100
+`define R_Format 3'b101
+
+// Branch generator definitions
+`define EQ 3'b000
+`define NE 3'b001
+`define LT 3'b010
+`define GE 3'b011
+`define LTU 3'b100
+`define GEU 3'b101
 
 // ALU definitions
 `define ALU_ADD 4'b0000
@@ -76,6 +91,12 @@
 `define F7_SRL 7'B0000000
 `define F7_SRA 7'B0100000
 
+// Memory definitions
+`define Word 2'b00
+`define Half 2'b01
+`define Byte 2'b10
+`define Signed 1'b1
+`define Unsigned 1'b0
 
 `define Read 1'b0
 `define Write 1'b1
@@ -97,7 +118,7 @@
 
 
 
-`define forward_reg2_RS1 2'b00
+`define forward_reg2_RS2 2'b00
 `define forward_reg2_EX 2'b01
 `define forward_reg2_MEM 2'b10
 `define forward_reg2_Zero 2'b11
