@@ -8,15 +8,16 @@ module ID_stage (
     input wire stall_i,  // Stall signal from ID stage.
     input wire [1:0] forward_reg1_i,
     input wire [1:0] forward_reg2_i,
+    
+    // From IF stage
+    input wire [31:0] Instruction_i,  // Instruction from Instruction Fetch (IF) stage
+    input wire [31:0] IF_PC_i,  // Program Counter from IF stage
+
 
     // From WB stage
     input wire        WB_reg_wr_en_i,  // Write enable signal from Write Back (WB) stage
     input wire [4:0]  WB_rd_addr_i,  // Source register for WB stage
     input wire [31:0] WB_wr_data_i,  // Data to be written in WB stage
-
-    // From IF stage
-    input wire [31:0] IF_Instruction_i,  // Instruction from Instruction Fetch (IF) stage
-    input wire [31:0] IF_PC_i,  // Program Counter from IF stage
 
     // Data forwarding
     input wire [31:0] EX_ALU_result_i,  // ALU result from EX stage
@@ -28,7 +29,6 @@ module ID_stage (
     // Control signals
     output reg ID_mem_wr_en_o,
     output reg ID_Ld_sgn_o,
-    output reg ID_flush_o,
 
     output reg         ID_rd_wr_en_o,
     output reg         ID_rd_src_o,  // Source register for Write operation
@@ -39,6 +39,7 @@ module ID_stage (
     output reg [3:0]   ID_alu_op_o,  // ALU operation 
     output reg [1:0]   ID_mem_op_size_o,  // Memory operation size
     output reg [31:0]  ID_imm_o,
+    output reg [31:0] ID_PC_o,  
 
     // For Branching
     output reg ID_branch_en_o,  // 0 -> PC + 4, 1 -> ID_branch_addr_o
@@ -49,7 +50,7 @@ module ID_stage (
   // Internal signals
   wire [4:0] rs1_addr, rs2_addr, rd;
   wire [31:0] Instruction;
-  assign Instruction = (flush_i) ? `NOP_instruction : IF_Instruction_i;
+  assign Instruction = (flush_i) ? `NOP_instruction : Instruction_i;
   assign rs1_addr = Instruction[19:15];
   assign rs2_addr = Instruction[24:20];
   assign rd  = Instruction[11:7];
